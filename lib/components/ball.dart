@@ -1,5 +1,6 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../game.dart';
@@ -15,12 +16,16 @@ class Ball extends CircleComponent
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    if (gameRef.mode == GameMode.multiple) {
-      message = Message(
-          'Tap on the ball to play\nPlayer 1: Use W/S keys to play\nPlayer 2: Use ArrowUp/ArrowDown keys to play');
+    if (kIsWeb) {
+      if (gameRef.mode == GameMode.multiple) {
+        message = Message(
+            'Tap on the ball to play\nPlayer 1: Use W/S keys to play\nPlayer 2: Use ArrowUp/ArrowDown keys to play');
+      } else {
+        message = Message(
+            'Tap on the ball to play\nUse ArrowLeft/ArrowRight keys to play');
+      }
     } else {
-      message = Message(
-          'Tap on the ball to play\nUse ArrowLeft/ArrowRight keys to play');
+      message = Message('Tap on the ball to play');
     }
     gameRef.add(message!);
     radius = 20;
@@ -55,11 +60,17 @@ class Ball extends CircleComponent
     velocity = Vector2(list.first, list.last);
   }
 
-  void replay() {
+  void reset() {
     gameRef.miss = 0;
     gameRef.points?.score = 0;
     gameRef.player1?.score = 0;
     gameRef.player2?.score = 0;
+    position = gameRef.size / 2;
+    velocity = Vector2.zero();
+  }
+
+  void replay() {
+    reset();
     start();
   }
 
@@ -105,9 +116,16 @@ class Ball extends CircleComponent
           gameRef.miss++;
           if (gameRef.miss == 3) {
             gameRef.isGameStarted = false;
-            message = Message(
-                'Game over. Your score: ${gameRef.points?.score}\nPress space to replay\nPress enter for main menu');
-            gameRef.add(message!);
+            if (kIsWeb) {
+              message = Message(
+                  'Game over. Your score: ${gameRef.points?.score}\nPress space to replay\nPress enter for main menu');
+              gameRef.add(message!);
+            } else {
+              message = Message(
+                  'Game over. Your score: ${gameRef.points?.score}\nTap on the ball to replay');
+              gameRef.add(message!);
+              reset();
+            }
           } else {
             start();
           }
