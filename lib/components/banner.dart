@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
@@ -7,7 +9,7 @@ import 'mode.dart';
 
 class GameBanner extends RectangleComponent with HasGameRef<MyGame> {
   @override
-  Future<void>? onLoad() {
+  FutureOr<void> onLoad() {
     position = Vector2(gameRef.size[0] / 2, gameRef.size[1] / 2);
     size = Vector2(gameRef.size[0] / 4, gameRef.size[1] / 4);
     anchor = Anchor.center;
